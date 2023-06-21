@@ -116,7 +116,7 @@ onMounted(() => {
     :root{
         --azul: #3b82f6;
         --blanco: #fff;
-        --girs-claro: #f5f5f5;
+        --gris-claro: #f5f5f5;
         --gris: #94a3b8;
         --gris-oscuro: #64748b;
         --negro: #000;
@@ -133,7 +133,7 @@ onMounted(() => {
     body{
         font-size: 1.6rem;
         font-family: "Lato", sans-serif;
-        background-color: var(--girs-claro);
+        background-color: var(--gris-claro);
     }
     h1{
         font-size: 4rem;

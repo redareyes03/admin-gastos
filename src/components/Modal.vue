@@ -53,7 +53,7 @@ const agregarPresupuesto = () => {
         <div class="background" @click="error" />
 
 
-        <form class="form-modal sombra" :class="[modalState.animar ? 'mostrar' : ''],
+        <form class="form-modal contenedor sombra" :class="[modalState.animar ? 'mostrar' : ''],
             [errorModal && 'error']" @submit.prevent="agregarPresupuesto">
             <div class="campo">
                 <label for="nombre">Nombre</label>
@@ -98,7 +98,7 @@ const agregarPresupuesto = () => {
 }
 
 .modal {
-    position: absolute;
+    position: fixed;
     top: 0;
     left: 0;
     bottom: 0;
@@ -131,7 +131,6 @@ const agregarPresupuesto = () => {
 .form-modal {
     opacity: 0;
     background-color: var(--blanco);
-    width: 120rem;
     position: absolute;
     top: 50%;
     left: 50%;
@@ -147,6 +146,10 @@ const agregarPresupuesto = () => {
 
 .form-modal.error {
     animation: errorModal 300ms ease;
+}
+
+option{
+    text-transform: capitalize;
 }
 
 label {

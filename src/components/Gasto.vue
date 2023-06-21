@@ -1,5 +1,5 @@
 <script setup>
-import { formatearCantidad } from '../helpers'
+import { formatearCantidad, formatearFecha } from '../helpers'
 import IconoAhorro from '../assets/img/icono_ahorro.svg'
 import IconoCasa from '../assets/img/icono_casa.svg'
 import IconoComida from '../assets/img/icono_comida.svg'
@@ -30,9 +30,11 @@ const props = defineProps({
         <div class="contenido">
             <img :src="diccionarioIconos[gasto.categoria]" :alt="'Icono gasto' + gasto.categoria">
             <div class="detalles">
-                <p class="categoria">{{ gasto.categoria }}</p>
-                <p class="nombre">{{ gasto.nombre }}</p>
-                <p>{{ gasto.fecha }}</p>
+                <div>
+                    <p class="categoria">{{ gasto.categoria }}</p>
+                    <p class="nombre">{{ gasto.nombre }}</p>
+                    <p class="fecha"><span>Fecha:</span> {{ formatearFecha(gasto.fecha) }}</p>
+                </div>
                 <p class="cantidad">{{ formatearCantidad(gasto.cantidad) }}</p>
             </div>
         </div>
@@ -42,14 +44,55 @@ const props = defineProps({
 <style scoped>
 .gasto {
     padding: 1.5rem 4rem;
+    margin-bottom: 4rem;
 }
 
 .contenido{
     display: flex;
+    gap: 3rem;
 }
 
 .contenido img{
-    width: 5rem;
+    width: 4.5rem;
+}
+
+.detalles{
+    display: flex;
+    width: 100%;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.detalles div p{
+    margin: 0;
+    margin-bottom: 1rem;
+}
+
+.detalles .categoria{
+    text-transform: uppercase;
+    color: var(--gris);
+    font-weight: 900;
+    font-size: 1.2rem;
+}
+
+.detalles .nombre{
+    color: var(--gris-oscuro);
+    font-size: 2.4rem;
+    text-transform: capitalize;
+    font-weight: 700;
+}
+
+.detalles .fecha{
+    color: var(--gris-oscuro);
+}
+
+.detalles .fecha span{
+    font-weight: 900;
+}
+
+.detalles .cantidad{
+    font-weight: 900;
+    font-size: 2rem;
 }
 
 </style>
