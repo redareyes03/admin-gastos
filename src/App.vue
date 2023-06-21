@@ -1,15 +1,20 @@
 <script setup>
 import { onMounted, ref, watch } from 'vue';
+import imgNuevoGasto from './assets/img/nuevo-gasto.svg'
 import Presupuesto from './components/Presupuesto.vue'
 import ControlPresupuesto from './components/ControlPresupuesto.vue'
+import Modal from './components/Modal.vue';
 
-const presupuesto = ref(0);
+const presupuesto = ref(0)
 const disponible = ref(0)
+const isOpenModal = ref(false)
 
 const definirPresupuesto = (nuevoPresupuesto) => {
     presupuesto.value = nuevoPresupuesto
     disponible.value = nuevoPresupuesto
 }
+
+const setModalState = (value) => isOpenModal.value = value
 
 watch(presupuesto, () => window.localStorage.setItem('presupuesto', JSON.stringify(presupuesto.value)))
 watch(disponible, () => window.localStorage.setItem('disponible', JSON.stringify(disponible.value)))
@@ -35,8 +40,20 @@ onMounted(() => {
         </div>
     </header>
 
-    
+    <main v-if="presupuesto">
+        <div class="crear-gasto">
+            <img
+            alt="Icono nuevo gasto"
+            :src="imgNuevoGasto"
+            @click="setModalState(true)"
+            >
+        </div>
+    </main>
 
+    <Modal
+    v-if="isOpenModal"
+    @close-modal="setModalState"
+    />
 </template>
 
 <style >
@@ -95,4 +112,58 @@ onMounted(() => {
         background-color: var(--blanco);
         border-radius: 1.2rem;
     }
+
+    .crear-gasto{
+        position: fixed;
+        bottom: 5rem;
+        right: 5rem;
+    }
+
+    .crear-gasto img{
+        width: 5rem;
+        cursor: pointer;
+        opacity: 0.8;
+    }
+
+    .crear-gasto img:hover{
+        opacity: 1;
+        transition: opacity 300ms ease;
+    }
+
+    .campo{
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+        margin-bottom: 2.5rem;
+    }
+
+    input[type="submit"]{
+        background-color: var(--azul);
+        border: none;
+        padding: 1rem;
+        text-align: center;
+        font-size: 2rem;
+        
+        color: var(--blanco);
+        font-weight: 900;
+        width: 100%;
+        cursor: pointer;
+        text-transform: uppercase;
+    }
+
+    input, select{
+        background-color: var(--gris-claro);
+        border-radius: 1rem;
+        padding: 1rem;
+        border: 1px solid var(--gris-oscuro);
+        outline: none;
+        font-size: 2.2rem;
+    }
+
+    input[type="submit"]:hover{
+        background-color: #1048A4;
+        transition: background-color 300ms ease;
+    }
+
+    
 </style>
