@@ -4,6 +4,8 @@ import imgNuevoGasto from './assets/img/nuevo-gasto.svg'
 import Presupuesto from './components/Presupuesto.vue'
 import ControlPresupuesto from './components/ControlPresupuesto.vue'
 import Modal from './components/Modal.vue';
+import Gasto from './components/Gasto.vue'
+import {v4 as uid} from 'uuid'
 
 const presupuesto = ref(0)
 const disponible = ref(0)
@@ -12,15 +14,27 @@ const gasto = reactive({
     nombre: "",
     cantidad: "",
     categoria: "",
-    fecha: Date.now(),
+    fecha: "",
     id: null}
 )
 
 const gastos = ref([])
 
-const agregarGasto = () => gastos.value.push({
-    ...gasto
-})
+const agregarGasto = () => {
+    gastos.value.push({
+        ...gasto,
+        id: uid(),
+        fecha: Date.now()
+    })
+
+    closeModal()
+
+    Object.assign(gasto, {
+        nombre: "",
+        cantidad: "",
+        categoria: "",
+    })
+}
 
 const modalState = reactive({
     isOpen: false, animar: false
@@ -44,10 +58,12 @@ const definirPresupuesto = (nuevoPresupuesto) => {
 
 watch(presupuesto, () => window.localStorage.setItem('presupuesto', JSON.stringify(presupuesto.value)))
 watch(disponible, () => window.localStorage.setItem('disponible', JSON.stringify(disponible.value)))
+watch(gastos, () =>  window.localStorage.setItem('gastos', JSON.stringify(gastos.value)), {deep: true})
 
 onMounted(() => {
     presupuesto.value = Number(window.localStorage.getItem('presupuesto'))
     disponible.value = Number(window.localStorage.getItem('disponible'))
+    gastos.value = JSON.parse(window.localStorage.getItem('gastos'))
 })
 </script>
 
@@ -67,6 +83,15 @@ onMounted(() => {
     </header>
 
     <main v-if="presupuesto">
+        <div class="listado-gastos contenedor">
+            <h2>{{ gastos.length ? 'Gastos' : 'No hay gastos' }}</h2>
+
+            <Gasto 
+                v-for="gasto in gastos"
+                :gasto="gasto"/>
+        </div>
+
+
         <div class="crear-gasto">
             <img
             alt="Icono nuevo gasto"
@@ -196,5 +221,7 @@ onMounted(() => {
         transition: background-color 300ms ease;
     }
 
-    
+    .listado-gastos{
+        margin-top: 10rem;
+    }
 </style>

@@ -64,7 +64,7 @@ const agregarPresupuesto = () => {
             <div class="campo">
                 <label for="cantidad">Cantidad</label>
                 <input id="cantidad" type="number" placeholder="Cantidad gastada $"
-                    @input="$emit('update:cantidad', $event.target.value)">
+                    @input="$emit('update:cantidad', +$event.target.value)">
             </div>
 
             <div class="campo">
