@@ -8,6 +8,20 @@ import Modal from './components/Modal.vue';
 const presupuesto = ref(0)
 const disponible = ref(0)
 
+const gasto = reactive({
+    nombre: "",
+    cantidad: "",
+    categoria: "",
+    fecha: Date.now(),
+    id: null}
+)
+
+const gastos = ref([])
+
+const agregarGasto = () => gastos.value.push({
+    ...gasto
+})
+
 const modalState = reactive({
     isOpen: false, animar: false
 })
@@ -64,8 +78,12 @@ onMounted(() => {
 
     <Modal
     v-if="modalState.isOpen"
-    @close-modal="closeModal"
     :modalState="modalState"
+    @close-modal="closeModal"
+    @agregar-gasto="agregarGasto"
+    v-model:nombre="gasto.nombre"
+    v-model:cantidad="gasto.cantidad"
+    v-model:categoria="gasto.categoria"
     />
 </template>
 
@@ -156,12 +174,12 @@ onMounted(() => {
         padding: 1rem;
         text-align: center;
         font-size: 2rem;
-        
         color: var(--blanco);
         font-weight: 900;
         width: 100%;
         cursor: pointer;
         text-transform: uppercase;
+        margin-bottom: 2rem;
     }
 
     input, select{

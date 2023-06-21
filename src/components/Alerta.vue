@@ -9,7 +9,7 @@
         padding: 1rem;
         font-weight: 900;
         text-transform: uppercase;
-        font-size: 1.6rem;
+        font-size: 1.8rem;
         text-align: center;
         background-color: var(--blanco);
         border-left: .5rem solid #891C1C;
