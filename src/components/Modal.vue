@@ -2,6 +2,17 @@
     import { ref } from 'vue';
 import imgBotonCerrar from '../assets/img/cerrar.svg'
     const emit = defineEmits(['close-modal'])
+
+    const props = defineProps({
+        modalState: {
+            type: Object,
+            required: true
+        }
+    })
+
+    const errorModal = ref(false)
+    const error = () => errorModal.value = true
+
 </script>
 
 <template>
@@ -9,11 +20,16 @@ import imgBotonCerrar from '../assets/img/cerrar.svg'
         <div class="boton-cerrar">
             <img 
             :src="imgBotonCerrar" alt="Boton cerrar modal"
-            @click="$emit('close-modal', false)"
+            @click="$emit('close-modal')"
             >
         </div>
 
-        <form class="form-modal sombra" :class="animar">
+        <div class="background" @click="error" />
+
+
+        <form class="form-modal sombra" 
+        :class="
+        [modalState.animar ? 'mostrar' : '']">
             <div class="campo">
                 <label for="nombre">Nombre</label>
                 <input id="nombre" type="text" placeholder="Nombre del gasto">
@@ -40,18 +56,27 @@ import imgBotonCerrar from '../assets/img/cerrar.svg'
 
             <input type="submit" value="agregar presupuesto">
         </form>
+
     </div>
 </template>
 
 <style scoped>
+    .modal{
+        
+        background-color: rgba(0, 0, 0, 0.6);
+        backdrop-filter: blur(3px);
+    }
     .modal{
         position: absolute;
         top: 0;
         left: 0;
         bottom: 0;
         right: 0;
-        background-color: rgba(0, 0, 0, 0.6);
-        backdrop-filter: blur(3px);
+    }
+
+    .background{
+        width: 100%;
+        height: 100%;
     }
 
     .boton-cerrar{
@@ -81,6 +106,8 @@ import imgBotonCerrar from '../assets/img/cerrar.svg'
         left: 50%;
         transform: translate(-50%, -50%);
         padding: 4rem;
+        transition: all 300ms ease-in-out;
+        z-index: 1;
     }
 
     .form-modal.mostrar{
@@ -89,5 +116,20 @@ import imgBotonCerrar from '../assets/img/cerrar.svg'
 
     label{
         font-size: 2.4rem;
+    }
+
+    @keyframes errorModal{
+        25% {
+            transform: translateX(5px);
+        }
+        50%{
+            transform: translateX(-5px);
+        }
+        75%{
+            transform: translateX(5px);
+        }
+        100%{
+            transform: translateX(-5px);
+        }
     }
 </style>

@@ -1,5 +1,5 @@
 <script setup>
-import { onMounted, ref, watch } from 'vue';
+import { onMounted, reactive, ref, watch } from 'vue';
 import imgNuevoGasto from './assets/img/nuevo-gasto.svg'
 import Presupuesto from './components/Presupuesto.vue'
 import ControlPresupuesto from './components/ControlPresupuesto.vue'
@@ -7,14 +7,26 @@ import Modal from './components/Modal.vue';
 
 const presupuesto = ref(0)
 const disponible = ref(0)
-const isOpenModal = ref(false)
+
+const modalState = reactive({
+    isOpen: false, animar: false
+})
+
+const openModal = () => {
+    modalState.isOpen = true
+    setTimeout(() => modalState.animar = true, 100)
+}
+
+const closeModal = () => {
+    modalState.animar = false
+    setTimeout(() => modalState.isOpen = false, 100)
+}
 
 const definirPresupuesto = (nuevoPresupuesto) => {
     presupuesto.value = nuevoPresupuesto
     disponible.value = nuevoPresupuesto
 }
 
-const setModalState = (value) => isOpenModal.value = value
 
 watch(presupuesto, () => window.localStorage.setItem('presupuesto', JSON.stringify(presupuesto.value)))
 watch(disponible, () => window.localStorage.setItem('disponible', JSON.stringify(disponible.value)))
@@ -45,14 +57,15 @@ onMounted(() => {
             <img
             alt="Icono nuevo gasto"
             :src="imgNuevoGasto"
-            @click="setModalState(true)"
+            @click="openModal"
             >
         </div>
     </main>
 
     <Modal
-    v-if="isOpenModal"
-    @close-modal="setModalState"
+    v-if="modalState.isOpen"
+    @close-modal="closeModal"
+    :modalState="modalState"
     />
 </template>
 
