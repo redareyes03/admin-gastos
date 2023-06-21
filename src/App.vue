@@ -4,15 +4,19 @@ import Presupuesto from './components/Presupuesto.vue'
 import ControlPresupuesto from './components/ControlPresupuesto.vue'
 
 const presupuesto = ref(0);
+const disponible = ref(0)
 
 const definirPresupuesto = (nuevoPresupuesto) => {
     presupuesto.value = nuevoPresupuesto
+    disponible.value = nuevoPresupuesto
 }
 
 watch(presupuesto, () => window.localStorage.setItem('presupuesto', JSON.stringify(presupuesto.value)))
+watch(disponible, () => window.localStorage.setItem('disponible', JSON.stringify(disponible.value)))
 
 onMounted(() => {
     presupuesto.value = Number(window.localStorage.getItem('presupuesto'))
+    disponible.value = Number(window.localStorage.getItem('disponible'))
 })
 </script>
 
@@ -24,10 +28,14 @@ onMounted(() => {
             v-if="!presupuesto"
             @definir-presupuesto="definirPresupuesto"
             />
-            <ControlPresupuesto v-else/>
+            <ControlPresupuesto v-else
+            :presupuesto="presupuesto"
+            :disponible="disponible"
+            />
         </div>
-        
     </header>
+
+    
 
 </template>
 
