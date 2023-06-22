@@ -22,6 +22,10 @@ const props = defineProps({
     categoria: {
         type: String,
         required: true
+    },
+    disponible: {
+        type: Number,
+        required: true
     }
 })
 
@@ -35,9 +39,21 @@ const agregarPresupuesto = () => {
     const { nombre, cantidad, categoria } = props
     if ([nombre, cantidad, cantidad].includes('')) {
         alerta.value = 'Hay campos vacios'
+        setTimeout(() => alerta.value = '', 1000)
         return
     }
 
+    if(cantidad<=0){
+        alerta.value = 'Cantidad invalida'
+        setTimeout(() => alerta.value = '', 1000)
+        return
+    }
+    
+    if(cantidad> props.disponible){
+        alerta.value = 'El presupuesto excede el limite'
+        setTimeout(() => alerta.value = '', 1000)
+        return
+    }
     alerta.value = ''
     emit('agregar-gasto')
 }   
@@ -55,6 +71,7 @@ const agregarPresupuesto = () => {
 
         <form class="form-modal contenedor sombra" :class="[modalState.animar ? 'mostrar' : ''],
             [errorModal && 'error']" @submit.prevent="agregarPresupuesto">
+            <h2>Agregar gasto</h2>
             <div class="campo">
                 <label for="nombre">Nombre</label>
                 <input id="nombre" type="text" placeholder="Nombre del gasto"
@@ -138,6 +155,13 @@ const agregarPresupuesto = () => {
     padding: 4rem;
     transition: all 300ms ease-in-out;
     z-index: 1;
+}
+
+.form-modal h2{
+    margin: 0;
+    margin-bottom: 2rem;
+    text-transform: uppercase;
+
 }
 
 .form-modal.mostrar {

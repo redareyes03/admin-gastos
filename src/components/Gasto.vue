@@ -43,8 +43,9 @@ const props = defineProps({
 
 <style scoped>
 .gasto {
-    padding: 1.5rem 4rem;
+    padding: 2rem 4rem;
     margin-bottom: 4rem;
+    cursor: pointer;
 }
 
 .contenido{

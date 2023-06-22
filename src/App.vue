@@ -9,6 +9,7 @@ import {v4 as uid} from 'uuid'
 
 const presupuesto = ref(0)
 const disponible = ref(0)
+const gastado = ref(0)
 
 const gasto = reactive({
     nombre: "",
@@ -19,6 +20,16 @@ const gasto = reactive({
 )
 
 const gastos = ref([])
+
+watch(presupuesto, () => window.localStorage.setItem('presupuesto', JSON.stringify(presupuesto.value)))
+watch(disponible, () => window.localStorage.setItem('disponible', JSON.stringify(disponible.value)))
+watch(gastos, () =>  {
+    window.localStorage.setItem('gastos', JSON.stringify(gastos.value))
+    gastado.value = gastos.value.reduce((total, gasto) => total + gasto.cantidad, 0)
+    disponible.value = presupuesto.value - gastado.value
+}
+, {deep: true}
+)
 
 const agregarGasto = () => {
     gastos.value.push({
@@ -56,13 +67,14 @@ const definirPresupuesto = (nuevoPresupuesto) => {
 }
 
 
-watch(presupuesto, () => window.localStorage.setItem('presupuesto', JSON.stringify(presupuesto.value)))
-watch(disponible, () => window.localStorage.setItem('disponible', JSON.stringify(disponible.value)))
-watch(gastos, () =>  window.localStorage.setItem('gastos', JSON.stringify(gastos.value)), {deep: true})
+
 
 onMounted(() => {
     presupuesto.value = Number(window.localStorage.getItem('presupuesto'))
     disponible.value = Number(window.localStorage.getItem('disponible'))
+    if(!JSON.parse(window.localStorage.getItem('gastos'))){
+        window.localStorage.setItem('gastos', JSON.stringify([]))
+    }
     gastos.value = JSON.parse(window.localStorage.getItem('gastos'))
 })
 </script>
@@ -78,6 +90,7 @@ onMounted(() => {
             <ControlPresupuesto v-else
             :presupuesto="presupuesto"
             :disponible="disponible"
+            :gastado="gastado"
             />
         </div>
     </header>
@@ -104,6 +117,7 @@ onMounted(() => {
     <Modal
     v-if="modalState.isOpen"
     :modalState="modalState"
+    :disponible="disponible"
     @close-modal="closeModal"
     @agregar-gasto="agregarGasto"
     v-model:nombre="gasto.nombre"
