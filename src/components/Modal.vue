@@ -26,6 +26,10 @@ const props = defineProps({
     disponible: {
         type: Number,
         required: true
+    },
+    edicion: {
+        type: Boolean,
+        required: true
     }
 })
 
@@ -35,8 +39,12 @@ const error = () => {
     setTimeout(() => errorModal.value = false, 300)
 }
 
+const cantidadAnterior = props.cantidad
+
 const agregarPresupuesto = () => {
-    const { nombre, cantidad, categoria } = props
+    const { nombre, cantidad, disponible, edicion } = props
+
+    
     if ([nombre, cantidad, cantidad].includes('')) {
         alerta.value = 'Hay campos vacios'
         setTimeout(() => alerta.value = '', 1000)
@@ -48,12 +56,22 @@ const agregarPresupuesto = () => {
         setTimeout(() => alerta.value = '', 1000)
         return
     }
-    
-    if(cantidad> props.disponible){
-        alerta.value = 'El presupuesto excede el limite'
-        setTimeout(() => alerta.value = '', 1000)
-        return
+    if(edicion){
+        if(cantidad > disponible + cantidadAnterior){
+            alerta.value = 'La cantidad excede el limite disponible'
+            setTimeout(() => alerta.value = '', 1000)
+            return
+        }
     }
+    else{
+        if(cantidad> disponible){
+            alerta.value = 'La cantidad excede el limite disponible'
+            setTimeout(() => alerta.value = '', 1000)
+            return
+        }
+    }
+
+    
     alerta.value = ''
     emit('agregar-gasto')
 }   
@@ -71,22 +89,24 @@ const agregarPresupuesto = () => {
 
         <form class="form-modal contenedor sombra" :class="[modalState.animar ? 'mostrar' : ''],
             [errorModal && 'error']" @submit.prevent="agregarPresupuesto">
-            <h2>Agregar gasto</h2>
+            <h2>{{ edicion ? 'Editar' : 'Agregar' }} gasto</h2>
             <div class="campo">
                 <label for="nombre">Nombre</label>
                 <input id="nombre" type="text" placeholder="Nombre del gasto"
-                    @input="$emit('update:nombre', $event.target.value)">
+                    @input="$emit('update:nombre', $event.target.value)"
+                    :value="nombre">
             </div>
 
             <div class="campo">
                 <label for="cantidad">Cantidad</label>
                 <input id="cantidad" type="number" placeholder="Cantidad gastada $"
-                    @input="$emit('update:cantidad', +$event.target.value)">
+                    @input="$emit('update:cantidad', +$event.target.value)"
+                    :value="cantidad">
             </div>
 
             <div class="campo">
                 <label for="categoria">Categoría</label>
-                <select id="categoria" @input="$emit('update:categoria', $event.target.value)">
+                <select id="categoria" @input="$emit('update:categoria', $event.target.value)" :value="categoria">
                     <option selected disabled>-- Seleccione --</option>
                     <option value="ahorro">ahorro</option>
                     <option value="comida">comida</option>
@@ -98,7 +118,7 @@ const agregarPresupuesto = () => {
                 </select>
             </div>
 
-            <input type="submit" value="agregar presupuesto">
+            <input type="submit" :value="[edicion ? 'editar' : 'agregar'] + ' gasto'">
             <Alerta v-if="alerta">
                 <p>{{ alerta }}</p>
             </Alerta>
@@ -159,9 +179,8 @@ const agregarPresupuesto = () => {
 
 .form-modal h2{
     margin: 0;
-    margin-bottom: 2rem;
+    margin-bottom: 3rem;
     text-transform: uppercase;
-
 }
 
 .form-modal.mostrar {

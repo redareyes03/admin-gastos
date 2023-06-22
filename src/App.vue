@@ -1,6 +1,7 @@
 <script setup>
 import { onMounted, reactive, ref, watch } from 'vue';
 import imgNuevoGasto from './assets/img/nuevo-gasto.svg'
+import imgBorrarGastos from './assets/img/delete.png'
 import Presupuesto from './components/Presupuesto.vue'
 import ControlPresupuesto from './components/ControlPresupuesto.vue'
 import Modal from './components/Modal.vue';
@@ -10,16 +11,21 @@ import {v4 as uid} from 'uuid'
 const presupuesto = ref(0)
 const disponible = ref(0)
 const gastado = ref(0)
-
 const gasto = reactive({
     nombre: "",
     cantidad: "",
     categoria: "",
     fecha: "",
-    id: null}
+    id: null
+}
 )
-
 const gastos = ref([])
+
+const modalState = reactive({
+    isOpen: false, animar: false
+})
+
+const edicion = ref(false)
 
 watch(presupuesto, () => window.localStorage.setItem('presupuesto', JSON.stringify(presupuesto.value)))
 watch(disponible, () => window.localStorage.setItem('disponible', JSON.stringify(disponible.value)))
@@ -32,24 +38,20 @@ watch(gastos, () =>  {
 )
 
 const agregarGasto = () => {
-    gastos.value.push({
-        ...gasto,
-        id: uid(),
-        fecha: Date.now()
-    })
+    if(gasto.id){
+        const idEditar = gastos.value.findIndex(({id}) => id === gasto.id )
+        gastos.value[idEditar] = {...gasto}
+    }else{
+        gastos.value.push({
+            ...gasto,
+            id: uid(),
+            fecha: Date.now()
+        })
+    }
 
     closeModal()
-
-    Object.assign(gasto, {
-        nombre: "",
-        cantidad: "",
-        categoria: "",
-    })
 }
 
-const modalState = reactive({
-    isOpen: false, animar: false
-})
 
 const openModal = () => {
     modalState.isOpen = true
@@ -58,7 +60,18 @@ const openModal = () => {
 
 const closeModal = () => {
     modalState.animar = false
-    setTimeout(() => modalState.isOpen = false, 100)
+    setTimeout(() => {
+        modalState.isOpen = false
+        Object.assign(gasto, {
+            nombre: "",
+            cantidad: "",
+            categoria: "",
+            fecha: "",
+            id: null
+        })
+        edicion.value = false;
+
+    }, 100)
 }
 
 const definirPresupuesto = (nuevoPresupuesto) => {
@@ -66,8 +79,12 @@ const definirPresupuesto = (nuevoPresupuesto) => {
     disponible.value = nuevoPresupuesto
 }
 
-
-
+const editarGasto = (id) => {
+    edicion.value = true
+    const gastoEditar = gastos.value.filter(gasto => gasto.id === id)[0]
+    Object.assign(gasto, gastoEditar)
+    openModal()
+}
 
 onMounted(() => {
     presupuesto.value = Number(window.localStorage.getItem('presupuesto'))
@@ -101,7 +118,9 @@ onMounted(() => {
 
             <Gasto 
                 v-for="gasto in gastos"
-                :gasto="gasto"/>
+                :key="gasto.id"
+                :gasto="gasto"
+                @editar-gasto="editarGasto"/>
         </div>
 
 
@@ -112,12 +131,20 @@ onMounted(() => {
             @click="openModal"
             >
         </div>
+
+        <div class="borrar-gastos">
+            <img 
+            alt="Icono borrar gastos"
+            :src="imgBorrarGastos" 
+            >
+        </div>
     </main>
 
     <Modal
     v-if="modalState.isOpen"
     :modalState="modalState"
     :disponible="disponible"
+    :edicion="edicion"
     @close-modal="closeModal"
     @agregar-gasto="agregarGasto"
     v-model:nombre="gasto.nombre"
@@ -138,6 +165,7 @@ onMounted(() => {
     html{
         font-size: 62.5%;
         box-sizing: border-box;
+        scroll-behavior: smooth;
     }
     *,
     *::before,
@@ -183,19 +211,26 @@ onMounted(() => {
         border-radius: 1.2rem;
     }
 
-    .crear-gasto{
+    .crear-gasto, .borrar-gastos{
         position: fixed;
-        bottom: 5rem;
         right: 5rem;
     }
-
-    .crear-gasto img{
-        width: 5rem;
-        cursor: pointer;
-        opacity: 0.8;
+    
+    .crear-gasto{
+        bottom: 5rem;
     }
 
-    .crear-gasto img:hover{
+    .borrar-gastos{
+        bottom: 12rem;
+    }
+
+    :is(.crear-gasto, .borrar-gastos) img{
+        width: 5rem;
+        cursor: pointer;
+        opacity: 0.7;
+    }
+
+    :is(.crear-gasto, .borrar-gastos) img:hover{
         opacity: 1;
         transition: opacity 300ms ease;
     }

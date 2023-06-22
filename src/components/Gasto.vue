@@ -23,10 +23,12 @@ const props = defineProps({
         required: true
     }
 })
+
+defineEmits(['editar-gasto'])
 </script>
 
 <template>
-    <div class="gasto sombra">
+    <div class="gasto sombra" @click="$emit('editar-gasto', gasto.id)">
         <div class="contenido">
             <img :src="diccionarioIconos[gasto.categoria]" :alt="'Icono gasto' + gasto.categoria">
             <div class="detalles">
