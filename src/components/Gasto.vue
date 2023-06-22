@@ -7,6 +7,7 @@ import IconoGastos from '../assets/img/icono_gastos.svg'
 import IconoOcio from '../assets/img/icono_ocio.svg'
 import IconoSalud from '../assets/img/icono_salud.svg'
 import IconoSuscripciones from '../assets/img/icono_suscripciones.svg'
+import { computed, ref, watch } from 'vue'
 const diccionarioIconos = {
     ahorro: IconoAhorro,
     comida: IconoComida,
@@ -21,14 +22,37 @@ const props = defineProps({
     gasto: {
         type: Object,
         required: true
+    },
+    borrar:{
+        type: Boolean,
+        required: true
+    }
+})
+const emit = defineEmits(['modificar-gasto'])
+
+const eliminado = ref(false);
+
+const modificar = () => {
+    if(props.borrar){
+        eliminado.value = true
+    }
+    emit('modificar-gasto', props.gasto.id)
+    
+}
+
+watch(() => props.borrar, () => {
+    if(props.borrar === false){
+        eliminado.value = false
     }
 })
 
-defineEmits(['editar-gasto'])
 </script>
 
 <template>
-    <div class="gasto sombra" @click="$emit('editar-gasto', gasto.id)">
+    <div 
+    class="gasto sombra" 
+    :class="[borrar && 'borrar'] , [(eliminado && borrar) && 'eliminado']"
+    @click="modificar">
         <div class="contenido">
             <img :src="diccionarioIconos[gasto.categoria]" :alt="'Icono gasto' + gasto.categoria">
             <div class="detalles">
@@ -48,7 +72,18 @@ defineEmits(['editar-gasto'])
     padding: 2rem 4rem;
     margin-bottom: 4rem;
     cursor: pointer;
+    transition: background-color 300ms ease;
 }
+
+.gasto.borrar:hover, .gasto.eliminado{
+    background-color: rgb(241, 93, 93);
+}
+
+
+:is(.gasto.borrar:hover, .gasto.eliminado) p{
+    color: var(--blanco);
+}
+
 
 .contenido{
     display: flex;

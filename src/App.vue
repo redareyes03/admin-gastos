@@ -20,12 +20,14 @@ const gasto = reactive({
 }
 )
 const gastos = ref([])
-
 const modalState = reactive({
     isOpen: false, animar: false
 })
-
+// Modos
 const edicion = ref(false)
+const borrar = ref(false)
+const gastosEliminados = ref([])
+
 
 watch(presupuesto, () => window.localStorage.setItem('presupuesto', JSON.stringify(presupuesto.value)))
 watch(disponible, () => window.localStorage.setItem('disponible', JSON.stringify(disponible.value)))
@@ -86,6 +88,28 @@ const editarGasto = (id) => {
     openModal()
 }
 
+const activarModoBorrar = () => borrar.value = true
+const desactivarModoBorrar = () => {
+    borrar.value = false
+    gastosEliminados.value = []
+}
+
+const borrarGastos = () => {
+    gastos.value = gastos.value.filter(gasto => !gastosEliminados.value.some(eliminado => eliminado.id === gasto.id))
+    desactivarModoBorrar()
+}
+
+
+const modificarGasto = id => {
+    if(!borrar.value){
+        editarGasto(id)
+    }
+    else{
+        const gastoEliminar = gastos.value.filter(gasto => gasto.id === id)[0]
+        gastosEliminados.value.push(gastoEliminar)
+    }
+}
+
 onMounted(() => {
     presupuesto.value = Number(window.localStorage.getItem('presupuesto'))
     disponible.value = Number(window.localStorage.getItem('disponible'))
@@ -120,7 +144,8 @@ onMounted(() => {
                 v-for="gasto in gastos"
                 :key="gasto.id"
                 :gasto="gasto"
-                @editar-gasto="editarGasto"/>
+                :borrar="borrar"
+                @modificar-gasto="modificarGasto"/>
         </div>
 
 
@@ -135,9 +160,21 @@ onMounted(() => {
         <div class="borrar-gastos">
             <img 
             alt="Icono borrar gastos"
-            :src="imgBorrarGastos" 
+            :src="imgBorrarGastos"
+            @click="activarModoBorrar" 
             >
         </div>
+
+        <button 
+            v-if="borrar" 
+            class="boton-borrar"
+            @click="borrarGastos"
+        >Borrar</button>
+        <button 
+            v-if="borrar" 
+            class="desactivar-borrar"
+            @click="desactivarModoBorrar"
+        >Desactivar modo borrar</button>
     </main>
 
     <Modal
@@ -233,6 +270,32 @@ onMounted(() => {
     :is(.crear-gasto, .borrar-gastos) img:hover{
         opacity: 1;
         transition: opacity 300ms ease;
+    }
+
+    .desactivar-borrar, .boton-borrar{
+        border: none;
+        border-radius: 1rem;
+        padding: 1rem;
+        text-align: center;
+        font-size: 2rem;
+        color: var(--blanco);
+        font-weight: 900;
+        cursor: pointer;
+        text-transform: uppercase;
+        position: fixed;
+        bottom: 4rem;
+    }
+
+    .boton-borrar{
+        background-color: #f83232;
+        left: 40%;
+        transform: translateX(-50%);
+    }
+    
+    .desactivar-borrar{
+        background-color: var(--azul);
+        left: 60%;
+        transform: translateX(-50%);
     }
 
     .campo{
