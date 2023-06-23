@@ -8,7 +8,7 @@
     
     const definirPresupuesto = () => {
         if(presupuesto.value <= 0){
-            alerta.value = 'Hay campos vacíos'
+            alerta.value = 'Presupuesto inválido'
             return
         }
         alerta.value = ''

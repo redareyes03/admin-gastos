@@ -95,10 +95,11 @@ const desactivarModoBorrar = () => {
 }
 
 const borrarGastos = () => {
-    gastos.value = gastos.value.filter(gasto => !gastosEliminados.value.some(eliminado => eliminado.id === gasto.id))
-    desactivarModoBorrar()
+    if(gastosEliminados.value.length > 0){
+        gastos.value = gastos.value.filter(gasto => !gastosEliminados.value.some(eliminado => eliminado.id === gasto.id))
+        desactivarModoBorrar()
+    }
 }
-
 
 const modificarGasto = id => {
     if(!borrar.value){
@@ -108,6 +109,12 @@ const modificarGasto = id => {
         const gastoEliminar = gastos.value.filter(gasto => gasto.id === id)[0]
         gastosEliminados.value.push(gastoEliminar)
     }
+}
+
+const resetearApp = () => {
+    presupuesto.value = 0
+    disponible.value = 0
+    gastos.value = []
 }
 
 onMounted(() => {
@@ -125,13 +132,14 @@ onMounted(() => {
         <h1>Planificador de Gastos</h1>
         <div class="contenedor-header contenedor sombra">
             <Presupuesto
-            v-if="!presupuesto"
-            @definir-presupuesto="definirPresupuesto"
+                v-if="!presupuesto"
+                @definir-presupuesto="definirPresupuesto"
             />
             <ControlPresupuesto v-else
-            :presupuesto="presupuesto"
-            :disponible="disponible"
-            :gastado="gastado"
+                :presupuesto="presupuesto"
+                :disponible="disponible"
+                :gastado="gastado"
+                @resetear-app="resetearApp"
             />
         </div>
     </header>
@@ -147,7 +155,6 @@ onMounted(() => {
                 :borrar="borrar"
                 @modificar-gasto="modificarGasto"/>
         </div>
-
 
         <div class="crear-gasto">
             <img
@@ -178,15 +185,15 @@ onMounted(() => {
     </main>
 
     <Modal
-    v-if="modalState.isOpen"
-    :modalState="modalState"
-    :disponible="disponible"
-    :edicion="edicion"
-    @close-modal="closeModal"
-    @agregar-gasto="agregarGasto"
-    v-model:nombre="gasto.nombre"
-    v-model:cantidad="gasto.cantidad"
-    v-model:categoria="gasto.categoria"
+        v-if="modalState.isOpen"
+        :modalState="modalState"
+        :disponible="disponible"
+        :edicion="edicion"
+        @close-modal="closeModal"
+        @agregar-gasto="agregarGasto"
+        v-model:nombre="gasto.nombre"
+        v-model:cantidad="gasto.cantidad"
+        v-model:categoria="gasto.categoria"
     />
 </template>
 
